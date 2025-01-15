@@ -8,6 +8,10 @@ simple_etl/
 │   ├── database/
 │   └── files/
 │
+├── docs/
+│   ├── flowchart.drawio
+│   └── flowchart.jpg
+│
 ├── src/
 │   ├── __init__.py
 │   ├── extract.py
