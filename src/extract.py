@@ -6,6 +6,7 @@ import httpx
 
 USERS_ENDPOINT = "https://dummyjson.com/users"
 USER_CARTS_ENDPOINT = "https://dummyjson.com/carts/user"
+PRODUCTS_ENDPOINT = "https://dummyjson.com/products"
 
 log_file_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
@@ -72,8 +73,9 @@ def get_user_carts(
     -------
         dict: A dictionary containing user carts data.
     """
+    url = f"{USER_CARTS_ENDPOINT}/{user_id}"
     try:
-        resp = httpx.get(f"{USER_CARTS_ENDPOINT}/{user_id}")
+        resp = httpx.get(url)
         resp.raise_for_status()
     except httpx.RequestError as exc:
         logger.error(
@@ -87,6 +89,37 @@ def get_user_carts(
     else:
         return resp.json()
 
+def get_product_category(
+        product_id: int
+) -> str | None:
+    """
+    Get product category from the PRODUCTS_ENDPOINT.
+
+    Parameters
+    ----------
+    product_id : int
+        The unique id of the product.
+
+    Returns
+    -------
+        str: The category of the product.
+    """
+    url = f"{PRODUCTS_ENDPOINT}/{product_id}"
+    query_params = {'select': 'category'}
+    try:
+        resp = httpx.get(url, params=query_params)
+        resp.raise_for_status()
+    except httpx.RequestError as exc:
+        logger.error(
+            f"An error occurred while requesting {exc.request.url!r}.")
+        return
+    except httpx.HTTPStatusError as exc:
+        logger.error(
+            f"Error response {exc.response.status_code} "
+            f"while requesting {exc.request.url!r}.")
+        return
+    else:
+        return resp.json().get('category')
 
 def get_query_params(
         limit: int,
