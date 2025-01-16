@@ -5,6 +5,7 @@ from collections.abc import Sequence
 import httpx
 
 USERS_ENDPOINT = "https://dummyjson.com/users"
+USER_CARTS_ENDPOINT = "https://dummyjson.com/carts/user"
 
 log_file_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
@@ -34,7 +35,7 @@ def get_users(
 
     Returns
     -------
-        Dict[str, str]: A dictionary containing users data.
+        dict: A dictionary containing users data.
     """
     try:
         query_params = get_query_params(limit, skip, select)
@@ -43,6 +44,37 @@ def get_users(
     except ValueError as exc:
         logger.error(exc)
         return
+    except httpx.RequestError as exc:
+        logger.error(
+            f"An error occurred while requesting {exc.request.url!r}.")
+        return
+    except httpx.HTTPStatusError as exc:
+        logger.error(
+            f"Error response {exc.response.status_code} "
+            f"while requesting {exc.request.url!r}.")
+        return
+    else:
+        return resp.json()
+
+
+def get_user_carts(
+        user_id: int
+) -> dict | None:
+    """
+    Get user carts from the USER_CARTS_ENDPOINT.
+
+    Parameters
+    ----------
+    user_id : int
+        The unique id of the user.
+
+    Returns
+    -------
+        dict: A dictionary containing user carts data.
+    """
+    try:
+        resp = httpx.get(f"{USER_CARTS_ENDPOINT}/{user_id}")
+        resp.raise_for_status()
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
