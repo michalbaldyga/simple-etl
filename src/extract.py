@@ -1,9 +1,19 @@
+import logging.config
+import os
 from collections.abc import Sequence
 
 import httpx
 
 USERS_ENDPOINT = "https://dummyjson.com/users"
 
+log_file_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
+)
+logging.config.fileConfig(
+    "config/logging.conf",
+    defaults={"logfilename": repr(log_file_path)}
+)
+logger = logging.getLogger("logger_file")
 
 def get_users(
         limit: int = 30,
@@ -31,14 +41,16 @@ def get_users(
         resp = httpx.get(USERS_ENDPOINT, params=query_params)
         resp.raise_for_status()
     except ValueError as exc:
-        print(exc)
+        logger.error(exc)
         return
     except httpx.RequestError as exc:
-        print(f"An error occurred while requesting {exc.request.url!r}.")
+        logger.error(
+            f"An error occurred while requesting {exc.request.url!r}.")
         return
     except httpx.HTTPStatusError as exc:
-        print(f"Error response {exc.response.status_code} while requesting "
-              f"{exc.request.url!r}.")
+        logger.error(
+            f"Error response {exc.response.status_code} "
+            f"while requesting {exc.request.url!r}.")
         return
     else:
         return resp.json()
