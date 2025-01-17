@@ -1,6 +1,8 @@
 import logging.config
 import os
 from collections.abc import Sequence
+from functools import partial
+from geopy.geocoders import Nominatim
 
 import httpx
 
@@ -155,3 +157,37 @@ def get_query_params(
         params['select'] = ','.join(select)
 
     return params
+
+def get_user_country(
+        latitude,
+        longitude
+) -> str | None:
+    """
+    Get the user's country based on coordinates.
+
+    Parameters
+    ----------
+    latitude : float
+        The latitude where the user is located.
+    longitude : float
+        The longitude where the user is located.
+
+    Returns
+    -------
+        str: User country.
+    """
+    geolocator = Nominatim(user_agent="simple-etl")
+    reverse = partial(geolocator.reverse, language="en")
+
+    try:
+        location = reverse((latitude, longitude))
+    except TimeoutError as exc:
+        logger.error(exc)
+        return
+
+    if  not location:
+        logger.warning(
+            f"No location found for 'lat': {latitude}, 'lng': {longitude})")
+        return
+
+    return location.raw.get('address', {}).get('country')
