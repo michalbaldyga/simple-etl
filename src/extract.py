@@ -2,6 +2,8 @@ import logging.config
 import os
 from collections.abc import Sequence
 from functools import partial
+
+import backoff
 from geopy.geocoders import Nominatim
 
 import httpx
@@ -158,6 +160,10 @@ def get_query_params(
 
     return params
 
+@backoff.on_exception(backoff.expo,
+                      TimeoutError,
+                      max_tries=10,
+                      logger=logger)
 def get_user_country(
         latitude,
         longitude
