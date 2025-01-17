@@ -162,7 +162,7 @@ def get_query_params(
 
 @backoff.on_exception(backoff.expo,
                       TimeoutError,
-                      max_tries=10,
+                      max_tries=3,
                       logger=logger)
 def get_user_country(
         latitude,
