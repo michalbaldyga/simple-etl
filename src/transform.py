@@ -1,6 +1,6 @@
-from collections.abc import Sequence
 import logging.config
 import os
+from collections.abc import Sequence
 
 from src.extract import get_product_category, get_user_carts, get_user_country
 
