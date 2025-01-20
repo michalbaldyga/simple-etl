@@ -7,9 +7,11 @@ import backoff
 import httpx
 from geopy.geocoders import Nominatim
 
-USERS_ENDPOINT = "https://dummyjson.com/users"
-USER_CARTS_ENDPOINT = "https://dummyjson.com/carts/user"
-PRODUCTS_ENDPOINT = "https://dummyjson.com/products"
+from config.config import (
+    PRODUCTS_ENDPOINT,
+    USER_CARTS_ENDPOINT,
+    USERS_ENDPOINT,
+)
 
 log_file_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
@@ -45,20 +47,17 @@ def get_users(
         query_params = get_query_params(limit, skip, select)
         resp = httpx.get(USERS_ENDPOINT, params=query_params)
         resp.raise_for_status()
-    except ValueError as exc:
-        logger.error(exc)
-        raise
+    except ValueError:
+        logger.error("Both 'limit' and 'skip' must be non-negative integers.")
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
-        raise
     except httpx.HTTPStatusError as exc:
         logger.error(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
-        raise
     else:
-        return resp.json()
+        return resp.json().get('users')
 
 
 def get_user_carts(

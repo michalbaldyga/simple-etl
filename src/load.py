@@ -4,6 +4,8 @@ import os
 import sqlite3
 from collections.abc import Sequence
 
+from config.config import DATABASE
+
 log_file_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
 )
@@ -28,8 +30,6 @@ def save_to_db(users: Sequence[dict]):
     sqlite3.OperationalError
         If database operation failed.
     """
-    database = "data/database/shop.db"
-
     create_table = """
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY, 
@@ -51,7 +51,7 @@ def save_to_db(users: Sequence[dict]):
     insert_values = [tuple(user.values()) for user in users]
 
     try:
-        with sqlite3.connect(database) as conn:
+        with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
             cursor.execute(create_table)
 
