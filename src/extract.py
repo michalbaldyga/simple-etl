@@ -4,9 +4,8 @@ from collections.abc import Sequence
 from functools import partial
 
 import backoff
-from geopy.geocoders import Nominatim
-
 import httpx
+from geopy.geocoders import Nominatim
 
 USERS_ENDPOINT = "https://dummyjson.com/users"
 USER_CARTS_ENDPOINT = "https://dummyjson.com/carts/user"

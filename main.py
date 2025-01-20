@@ -1,7 +1,8 @@
-from src.extract import get_users, get_user_carts, get_product_category, \
-    get_user_country
-
-from src.transform import extract_products_from_carts, group_products_by_category
+from src.extract import get_user_carts, get_users
+from src.transform import (
+    extract_products_from_carts,
+    group_products_by_category,
+)
 
 
 def main():
