@@ -1,5 +1,5 @@
 from src.extract import get_users
-from src.load import save_to_file
+from src.load import save_to_db
 from src.transform import get_user_data
 
 
@@ -9,7 +9,9 @@ def main():
     results = []
     for user in users:
         results.append(get_user_data(user))
-    save_to_file(results)
+
+    save_to_db(results)
+
 
 if __name__ == "__main__":
     main()
