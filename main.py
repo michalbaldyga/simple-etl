@@ -1,7 +1,7 @@
 from src.extract import get_user_carts, get_users
 from src.transform import (
     extract_products_from_carts,
-    group_products_by_category,
+    group_products_by_category, get_most_common_category,
 )
 
 
@@ -15,8 +15,10 @@ def main():
     print(carts)
 
     products = extract_products_from_carts(carts)
-    print(group_products_by_category(products))
-
+    products_gr = group_products_by_category(products)
+    products_gr['test'] = 20
+    print(products_gr)
+    print(get_most_common_category(products_gr))
     # get_user_country(52.509669, 13.376294)
 
 if __name__ == "__main__":
