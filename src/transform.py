@@ -3,6 +3,25 @@ from collections.abc import Sequence
 from src.extract import get_product_category
 
 
+def get_most_common_category(
+       products: dict[str, int]
+) -> str:
+    """
+    Get the category with the highest quantity from a dictionary of products.
+
+    Parameters
+    ----------
+    products : dict[str, int]
+        A dictionary where the keys are product categories and the
+        values are the total quantities of products in each category.
+
+    Returns
+    -------
+    str: The category with the highest quantity.
+    """
+    return max(products, key=products.get)
+
+
 def group_products_by_category(
         products: Sequence[dict]
 ) -> dict[str, int]:
