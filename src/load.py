@@ -1,6 +1,7 @@
 import csv
 import logging.config
 import os
+import sqlite3
 from collections.abc import Sequence
 
 log_file_path = os.path.abspath(
@@ -11,6 +12,58 @@ logging.config.fileConfig(
     defaults={"logfilename": repr(log_file_path)}
 )
 logger = logging.getLogger("logger_file")
+
+
+def save_to_db(users: Sequence[dict]):
+    """
+    Saves a sequence of user dictionaries to a database.
+
+    Parameters
+    ----------
+    users (Sequence[dict]):
+        A sequence of dictionaries representing user data.
+
+    Raises
+    ------
+    sqlite3.OperationalError
+        If database operation failed.
+    """
+    database = "data/database/shop.db"
+
+    create_table = """
+        CREATE TABLE IF NOT EXISTS users(
+            id INTEGER PRIMARY KEY, 
+            first_name TEXT NOT NULL, 
+            last_name TEXT NOT NULL, 
+            age INT NOT NULL, 
+            gender TEXT NOT NULL, 
+            country TEXT, 
+            fave_category TEXT
+        );
+    """
+
+    insert_into = """
+        INSERT INTO users(
+            first_name, last_name, age, gender, country, fave_category)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """
+
+    insert_values = [tuple(user.values()) for user in users]
+
+    try:
+        with sqlite3.connect(database) as conn:
+            cursor = conn.cursor()
+            cursor.execute(create_table)
+
+            if insert_values:
+                cursor.executemany(insert_into, insert_values)
+
+            conn.commit()
+            logger.info("Database has been updated.")
+
+    except sqlite3.OperationalError as err:
+        logger.error("Database operation failed:", err)
+        conn.rollback()
 
 
 def save_to_file(
