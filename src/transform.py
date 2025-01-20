@@ -1,11 +1,66 @@
 from collections.abc import Sequence
+import logging.config
+import os
 
-from src.extract import get_product_category
+from src.extract import get_product_category, get_user_carts, get_user_country
+
+log_file_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
+)
+logging.config.fileConfig(
+    "config/logging.conf",
+    defaults={"logfilename": repr(log_file_path)}
+)
+logger = logging.getLogger("logger_file")
+
+
+def get_user_data(
+        user: dict
+) -> dict:
+    """
+    Get user data with additional information such as country
+    and favorite product category.
+
+    Args:
+        user: dict
+        Dictionary containing user information.
+
+    Returns:
+        Dict[str, Any]: Processed user data with added details.
+    """
+    user_id = user.get('id')
+    if not user_id:
+        logger.error("User ID is missing.")
+        raise ValueError("User ID is missing.")
+
+    first_name = user.get('firstName', "Unknown")
+    last_name = user.get('lastName', "Unknown")
+    age = user.get('age', "Unknown")
+    gender = user.get('gender', "Unknown")
+
+    coordinates = user.get('address', {}).get('coordinates', {})
+    lat = coordinates.get('lat')
+    lng = coordinates.get('lng')
+    country = get_user_country(lat, lng) if lat and lng else "Unknown"
+
+    carts = get_user_carts(user_id).get('carts', [])
+    products = extract_products_from_carts(carts)
+    grouped_products = group_products_by_category(products)
+    favorite_category = get_most_common_category(grouped_products)
+
+    return {
+        'firstName': first_name,
+        'lastName': last_name,
+        'age': age,
+        'gender': gender,
+        'country': country,
+        'faveCategory': favorite_category
+    }
 
 
 def get_most_common_category(
        products: dict[str, int]
-) -> str:
+) -> str | None:
     """
     Get the category with the highest quantity from a dictionary of products.
 
@@ -19,7 +74,7 @@ def get_most_common_category(
     -------
     str: The category with the highest quantity.
     """
-    return max(products, key=products.get)
+    return max(products, key=products.get) if products else "Unknown"
 
 
 def group_products_by_category(
