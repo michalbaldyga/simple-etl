@@ -21,12 +21,14 @@ def get_user_data(
     Get user data with additional information such as country
     and favorite product category.
 
-    Args:
-        user: dict
+    Parameters
+    ----------
+    user: dict
         Dictionary containing user information.
 
-    Returns:
-        Dict[str, Any]: Processed user data with added details.
+    Returns
+    -------
+    dict: Processed user data with added details.
     """
     user_id = user.get('id')
     if not user_id:
