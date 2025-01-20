@@ -166,7 +166,7 @@ def get_query_params(
 def get_user_country(
         latitude,
         longitude
-) -> str | None:
+) -> str:
     """
     Get the user's country based on coordinates.
 
@@ -188,11 +188,11 @@ def get_user_country(
         location = reverse((latitude, longitude))
     except TimeoutError as exc:
         logger.error(exc)
-        return
+        return "Unknown"
 
-    if  not location:
+    if not location:
         logger.warning(
             f"No location found for 'lat': {latitude}, 'lng': {longitude})")
-        return
+        return "Unknown"
 
     return location.raw.get('address', {}).get('country')
