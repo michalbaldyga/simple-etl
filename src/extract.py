@@ -47,16 +47,16 @@ def get_users(
         resp.raise_for_status()
     except ValueError as exc:
         logger.error(exc)
-        return
+        raise
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
-        return
+        raise
     except httpx.HTTPStatusError as exc:
         logger.error(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
-        return
+        raise
     else:
         return resp.json()
 
