@@ -4,9 +4,15 @@
 ```plaintext
 simple_etl/
 │
+├── config/
+│   ├── config.py
+│   └── logging.conf
+│
 ├── data/
 │   ├── database/
+│   │   └── shop.db
 │   └── files/
+│       └── users.csv
 │
 ├── docs/
 │   ├── flowchart.drawio
@@ -22,7 +28,7 @@ simple_etl/
 │   └── __init__.py
 │
 ├── logs/
-│   └── etl.log
+│   └── app.log
 │
 ├── main.py
 ├── pyproject.toml
