@@ -2,7 +2,7 @@ import csv
 import logging.config
 import os
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from config.config import DATABASE, LOG_FILE_PATH, LOGGING_CONFIG_FILE
 
@@ -13,19 +13,16 @@ logging.config.fileConfig(
 logger = logging.getLogger("logger_file")
 
 
-def save_to_db(users: Sequence[dict]):
+def save_to_db(
+        users: Sequence[Mapping]
+) -> None:
     """
     Saves a sequence of user dictionaries to a database.
 
     Parameters
     ----------
-    users (Sequence[dict]):
+    users (Sequence[Mapping]):
         A sequence of dictionaries representing user data.
-
-    Raises
-    ------
-    sqlite3.OperationalError
-        If database operation failed.
     """
     create_table = """
         CREATE TABLE IF NOT EXISTS users(
@@ -64,37 +61,30 @@ def save_to_db(users: Sequence[dict]):
 
 
 def save_to_file(
-        users: Sequence[dict]
+        users: Sequence[Mapping]
 ) -> None:
     """
     Saves a sequence of user dictionaries to a CSV file.
 
     Parameters
     ----------
-    users (Sequence[dict]):
+    users (Sequence[Mapping]):
         A sequence of dictionaries representing user data.
-
-    Raises
-    ------
-    ValueError
-        If the `users` sequence is empty.
     """
+    if not users:
+        logger.error("Users sequence is empty.")
+        return
+
     file_name = "data/file/users.csv"
     file_exists = os.path.isfile(file_name) and os.path.getsize(file_name) > 0
     file_mode = 'a' if file_exists else 'w'
 
-    try:
-        with (open(file_name, mode=file_mode, newline='', encoding='utf-8')
-              as file):
-            writer = csv.DictWriter(file, fieldnames=users[0].keys())
-
-            if not file_exists:
-                writer.writeheader()
-
-            writer.writerows(users)
-    except IndexError:
-        logger.error("Users sequence is empty.")
-        return
+    with (open(file_name, mode=file_mode, newline='', encoding="utf-8")
+          as file):
+        writer = csv.DictWriter(file, fieldnames=users[0].keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerows(users)
 
     if file_exists:
         logger.info(f"New users has been appended to {file_name}.")

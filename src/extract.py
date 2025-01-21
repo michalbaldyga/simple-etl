@@ -23,8 +23,8 @@ logger = logging.getLogger("logger_file")
 def get_users(
         limit: int = 30,
         skip: int = 0,
-        select: Sequence[str] | None = None
-) -> dict | None:
+        select: Sequence[str] = None
+) -> list:
     """
     Get users data from the USERS_ENDPOINT.
 
@@ -34,12 +34,12 @@ def get_users(
         The maximum number of items to get.
     skip : int
         The number of items to skip.
-    select : Optional[Sequence[str]]
+    select : Sequence[str]
         A sequence of fields to select specific user data.
 
     Returns
     -------
-        dict: A dictionary containing users data.
+        list: A list containing users data.
     """
     try:
         query_params = get_query_params(limit, skip, select)
@@ -55,12 +55,12 @@ def get_users(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
     else:
-        return resp.json().get('users')
+        return resp.json().get("users", [])
 
 
 def get_user_carts(
         user_id: int
-) -> dict | None:
+) -> dict:
     """
     Get user carts from the USER_CARTS_ENDPOINT.
 
@@ -80,18 +80,16 @@ def get_user_carts(
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
-        return
     except httpx.HTTPStatusError as exc:
         logger.error(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
-        return
     else:
         return resp.json()
 
 def get_product_category(
         product_id: int
-) -> str | None:
+) -> str:
     """
     Get product category from the PRODUCTS_ENDPOINT.
 
@@ -105,21 +103,19 @@ def get_product_category(
         str: The category of the product.
     """
     url = f"{PRODUCTS_ENDPOINT}/{product_id}"
-    query_params = {'select': 'category'}
+    query_params = {"select": "category"}
     try:
         resp = httpx.get(url, params=query_params)
         resp.raise_for_status()
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
-        return
     except httpx.HTTPStatusError as exc:
         logger.error(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
-        return
     else:
-        return resp.json().get('category')
+        return resp.json().get("category")
 
 def get_query_params(
         limit: int,
@@ -135,24 +131,20 @@ def get_query_params(
         The maximum number of items to get.
     skip : int
         The number of items to skip.
-    select : Optional[Sequence[str]]
+    select : Sequence[str] | None
         A sequence of fields to select specific user data.
 
     Returns
     -------
-        Dict[str, str]: A dictionary of query parameters.
+        dict[str, str]: A dictionary of query parameters.
     """
     if limit < 0 or skip < 0:
         raise ValueError(
             "Both 'limit' and 'skip' must be non-negative integers.")
 
-    params = {
-        'limit': limit,
-        'skip': skip
-    }
-
+    params = {"limit": limit, "skip": skip}
     if select:
-        params['select'] = ','.join(select)
+        params["select"] = ','.join(select)
 
     return params
 
@@ -161,8 +153,8 @@ def get_query_params(
                       max_tries=3,
                       logger=logger)
 def get_user_country(
-        latitude,
-        longitude
+        latitude: float,
+        longitude: float
 ) -> str:
     """
     Get the user's country based on coordinates.
@@ -183,8 +175,10 @@ def get_user_country(
 
     try:
         location = reverse((latitude, longitude))
-    except TimeoutError as exc:
-        logger.error(exc)
+    except TimeoutError:
+        logger.error(
+            "The call to the geocoding service was aborted because "
+            "no response has been received.")
         return "Unknown"
 
     if not location:
@@ -192,4 +186,4 @@ def get_user_country(
             f"No location found for 'lat': {latitude}, 'lng': {longitude})")
         return "Unknown"
 
-    return location.raw.get('address', {}).get('country')
+    return location.raw.get("address", {}).get("country")
