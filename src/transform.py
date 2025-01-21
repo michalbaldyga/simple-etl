@@ -1,15 +1,12 @@
 import logging.config
-import os
 from collections.abc import Sequence
 
+from config.config import LOG_FILE_PATH, LOGGING_CONFIG_FILE
 from src.extract import get_product_category, get_user_carts, get_user_country
 
-log_file_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
-)
 logging.config.fileConfig(
-    "config/logging.conf",
-    defaults={"logfilename": repr(log_file_path)}
+    fname=LOGGING_CONFIG_FILE,
+    defaults={"logfilename": repr(LOG_FILE_PATH)}
 )
 logger = logging.getLogger("logger_file")
 

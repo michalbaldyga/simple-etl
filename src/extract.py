@@ -1,5 +1,4 @@
 import logging.config
-import os
 from collections.abc import Sequence
 from functools import partial
 
@@ -8,17 +7,16 @@ import httpx
 from geopy.geocoders import Nominatim
 
 from config.config import (
+    LOG_FILE_PATH,
+    LOGGING_CONFIG_FILE,
     PRODUCTS_ENDPOINT,
     USER_CARTS_ENDPOINT,
     USERS_ENDPOINT,
 )
 
-log_file_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "logs", "app.log")
-)
 logging.config.fileConfig(
-    "config/logging.conf",
-    defaults={"logfilename": repr(log_file_path)}
+    fname=LOGGING_CONFIG_FILE,
+    defaults={"logfilename": repr(LOG_FILE_PATH)}
 )
 logger = logging.getLogger("logger_file")
 
