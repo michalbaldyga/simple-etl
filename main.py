@@ -1,13 +1,33 @@
+import logging.config
+
+from config.config import LOG_FILE_PATH, LOGGING_CONFIG_FILE
 from src.extract import get_users
 from src.load import save_to_db
 from src.transform import get_user_data
 
+logging.config.fileConfig(
+    fname=LOGGING_CONFIG_FILE,
+    defaults={"logfilename": repr(LOG_FILE_PATH)}
+)
+logger = logging.getLogger("logger_file")
+
 
 def main():
     user_params = ["firstName", "lastName", "age", "gender", "address"]
-    users = get_users(30, 0, user_params)
-    results = [get_user_data(user) for user in users]
-    save_to_db(results)
+    batch_size = 30
+    offset = 0
+
+    while True:
+        try:
+            users = get_users(batch_size, offset, user_params)
+            if not users:
+                break
+            results = [get_user_data(user) for user in users]
+            save_to_db(results)
+            offset += batch_size
+        except Exception as exc:
+            logger.error(f"An unexpected error occurred: {exc}")
+
 
 if __name__ == "__main__":
     main()
