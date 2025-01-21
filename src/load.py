@@ -53,7 +53,7 @@ def save_to_db(
                 cursor.executemany(insert_into, insert_values)
 
             conn.commit()
-            logger.info(f"Database has been updated. {len(users)} new users.")
+            logger.info("Database has been updated.")
     except sqlite3.OperationalError as err:
         logger.error("Database operation failed:", err)
         conn.rollback()
@@ -91,6 +91,6 @@ def save_to_file(
         logger.error("Saving to file failed:", exc)
 
     if file_exists:
-        logger.info(f"{len(users)} users has been appended to {file_name}.")
+        logger.info(f"New users has been appended to {file_name}.")
     else:
-        logger.info(f"{file_name} has been created with {len(users)} users.")
+        logger.info(f"{file_name} has been created with new users.")
