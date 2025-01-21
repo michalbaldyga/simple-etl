@@ -54,11 +54,12 @@ def save_to_db(
 
             conn.commit()
             logger.info("Database has been updated.")
-
     except sqlite3.OperationalError as err:
         logger.error("Database operation failed:", err)
         conn.rollback()
-
+    except Exception as exc:
+        logger.error("Saving to database failed:", exc)
+        conn.rollback()
 
 def save_to_file(
         users: Sequence[Mapping]
@@ -79,12 +80,15 @@ def save_to_file(
     file_exists = os.path.isfile(file_name) and os.path.getsize(file_name) > 0
     file_mode = 'a' if file_exists else 'w'
 
-    with (open(file_name, mode=file_mode, newline='', encoding="utf-8")
-          as file):
-        writer = csv.DictWriter(file, fieldnames=users[0].keys())
-        if not file_exists:
-            writer.writeheader()
-        writer.writerows(users)
+    try:
+        with (open(file_name, mode=file_mode, newline='', encoding="utf-8")
+              as file):
+            writer = csv.DictWriter(file, fieldnames=users[0].keys())
+            if not file_exists:
+                writer.writeheader()
+            writer.writerows(users)
+    except Exception as exc:
+        logger.error("Saving to file failed:", exc)
 
     if file_exists:
         logger.info(f"New users has been appended to {file_name}.")

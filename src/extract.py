@@ -180,10 +180,13 @@ def get_user_country(
             "The call to the geocoding service was aborted because "
             "no response has been received.")
         return "Unknown"
+    except Exception as exc:
+        logger.error("Locating the user failed:", exc)
+        return "Unknown"
 
     if not location:
         logger.warning(
             f"No location found for 'lat': {latitude}, 'lng': {longitude})")
         return "Unknown"
 
-    return location.raw.get("address", {}).get("country")
+    return location.raw.get("address", {}).get("country", "Unknown")
