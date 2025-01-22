@@ -13,20 +13,20 @@ logger = logging.getLogger("logger_file")
 
 
 def get_user_data(
-        user: Mapping
-) -> dict[str, str | int]:
+        user: Mapping[str, Any]
+) -> dict[str, Any]:
     """
     Get user data with additional information such as country
     and favorite product category.
 
     Parameters
     ----------
-    user: Mapping
+    user: Mapping[str, Any]
         Dictionary containing user information.
 
     Returns
     -------
-    dict[str, str | int]: User data with added details.
+    dict[str, Any]: User data with added details.
     """
     user_id = user.get("id")
     if not user_id:
@@ -78,14 +78,14 @@ def get_most_common_category(
 
 
 def group_products_by_category(
-        products: Sequence[Mapping]
+        products: Sequence[Mapping[str, Any]]
 ) -> dict[str, int]:
     """
     Groups products by their categories and sums the quantities.
 
     Parameters
     ----------
-    products : Sequence[Mapping]
+    products : Sequence[Mapping[str, Any]]
         A sequence of dictionaries, where each dictionary represents
         a product with keys 'category' and 'quantity'.
 
@@ -103,8 +103,8 @@ def group_products_by_category(
 
 
 def extract_products_from_carts(
-        carts: Sequence[Mapping]
-) -> list[dict]:
+        carts: Sequence[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
     """
     Extracts products from the carts and returns a list of dictionaries
     in the following format:
@@ -113,12 +113,12 @@ def extract_products_from_carts(
 
     Parameters
     ----------
-    carts : Sequence[Mapping]
+    carts : Sequence[Mapping[str, Any]]
         A sequence representing the user's carts.
 
     Returns
     -------
-    list[dict]: A list of dictionaries, where each dictionary represents
+    list[dict[str, Any]]: A list of dictionaries, where each dictionary represents
     a product.
     """
     return [product for cart in carts
@@ -127,7 +127,7 @@ def extract_products_from_carts(
 
 def extract_products_from_cart(
         cart: Mapping[str, Any]
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """
     Extracts products from the cart and returns a list of dictionaries
     in the following format:
@@ -136,12 +136,12 @@ def extract_products_from_cart(
 
     Parameters
     ----------
-    cart : Mapping
+    cart : Mapping[str, Any]
         A dictionary representing the user's cart.
 
     Returns
     -------
-    list[dict]: A list of dictionaries, where each dictionary represents
+    list[dict[str, Any]]: A list of dictionaries, where each dictionary represents
     a product.
     """
     products = cart.get("products")

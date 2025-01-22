@@ -40,7 +40,7 @@ def get_users(
 
     Returns
     -------
-        list: A list containing users data.
+        list[dict[str, Any]]: A list containing users data.
     """
     try:
         query_params = get_query_params(limit, skip, select)
@@ -61,7 +61,7 @@ def get_users(
 
 def get_user_carts(
         user_id: int
-) -> dict:
+) -> dict[str, Any]:
     """
     Get user carts from the USER_CARTS_ENDPOINT.
 
@@ -72,7 +72,7 @@ def get_user_carts(
 
     Returns
     -------
-        dict: A dictionary containing user carts data.
+        dict[str, Any]: A dictionary containing user carts data.
     """
     url = f"{USER_CARTS_ENDPOINT}/{user_id}"
     try:
@@ -132,7 +132,7 @@ def get_query_params(
         The maximum number of items to get.
     skip : int
         The number of items to skip.
-    select : Sequence[str] | None
+    select : Sequence[str]
         A sequence of fields to select specific user data.
 
     Returns

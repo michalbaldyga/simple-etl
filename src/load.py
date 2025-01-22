@@ -3,6 +3,7 @@ import logging.config
 import os
 import sqlite3
 from collections.abc import Mapping, Sequence
+from typing import Any
 
 from config.config import DATABASE, LOG_FILE_PATH, LOGGING_CONFIG_FILE
 
@@ -14,14 +15,14 @@ logger = logging.getLogger("logger_file")
 
 
 def save_to_db(
-        users: Sequence[Mapping]
+        users: Sequence[Mapping[str, Any]]
 ) -> None:
     """
     Saves a sequence of user dictionaries to a database.
 
     Parameters
     ----------
-    users (Sequence[Mapping]):
+    users : Sequence[Mapping[str, Any]]
         A sequence of dictionaries representing user data.
     """
     create_table = """
@@ -62,14 +63,14 @@ def save_to_db(
         conn.rollback()
 
 def save_to_file(
-        users: Sequence[Mapping]
+        users: Sequence[Mapping[str, Any]]
 ) -> None:
     """
     Saves a sequence of user dictionaries to a CSV file.
 
     Parameters
     ----------
-    users (Sequence[Mapping]):
+    users : Sequence[Mapping[str, Any]]
         A sequence of dictionaries representing user data.
     """
     if not users:
