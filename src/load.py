@@ -1,6 +1,7 @@
 import csv
 import logging.config
 import sqlite3
+from sqlite3 import Error, Connection
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -8,7 +9,7 @@ from typing import Any
 from config.config import (
     DATABASE_PATH,
     LOG_FILE_PATH,
-    LOGGING_CONFIG_FILE,
+    LOGGING_CONFIG_FILE, CSV_FILE_PATH,
 )
 
 logging.config.fileConfig(
@@ -18,42 +19,114 @@ logging.config.fileConfig(
 logger = logging.getLogger("logger_file")
 
 
-def save_to_db(
-        users: Sequence[Mapping[str, Any]]
-) -> None:
+def open_db_connection(
+        database: str = DATABASE_PATH
+) -> Connection:
     """
-    Save a sequence of user dictionaries to a database.
+    Open a connection to the SQLite database file database.
 
     Parameters
     ----------
+    database : str
+        The database file path.
+
+    Returns
+    -------
+    Connection
+        A connection to the SQLite database.
+    """
+    try:
+        conn = sqlite3.connect(database)
+    except Error as err:
+        logger.error(f"Error occurred while attempting to "
+              f"open database connection: {err}")
+        raise
+    return conn
+
+
+def close_db_connection(
+        conn: Connection
+) -> None:
+    """
+    Close the database connection.
+
+    Parameters
+    ----------
+    conn : Connection
+        A connection to the SQLite database.
+    """
+    try:
+        conn.close()
+    except Error as err:
+        logger.error(f"Error occurred while attempting to "
+              f"close database connection: {err}")
+        raise
+
+
+def create_users_table(
+        conn: Connection
+) -> None:
+    """
+    Create users table in the SQLite database.
+
+    Parameters
+    ----------
+    conn : Connection
+        A connection to the SQLite database.
+    """
+    create_query_path = Path("src/sql/create_table.sql")
+    try:
+        create_query = create_query_path.read_text()
+    except Exception as err:
+        logger.error(f"Failed to read SQL file: {create_query_path} - {err}")
+        raise
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute(create_query)
+        conn.commit()
+    except sqlite3.DatabaseError as err:
+        logger.error("Database operation failed:", err)
+        raise
+    logger.info("Users table has been created.")
+
+
+def insert_into_users(
+        conn: Connection,
+        users: Sequence[Mapping[str, Any]]
+) -> None:
+    """
+    Insert users into SQLite database.
+
+    Parameters
+    ----------
+    conn : Connection
+        A connection to the SQLite database.
     users : Sequence[Mapping[str, Any]]
         A sequence of dictionaries representing user data.
     """
-    insert_values = [tuple(user.values()) for user in users]
+    if not users:
+        logger.info("No users to insert.")
+        return
 
+    insert_query_path = Path("src/sql/insert_into.sql")
     try:
-        with sqlite3.connect(DATABASE_PATH) as conn:
-            cursor = conn.cursor()
+        insert_query = insert_query_path.read_text()
+    except Exception as err:
+        logger.error(f"Failed to read SQL file: {insert_query_path} - {err}")
+        raise
 
-            create_query_path = Path("src/sql/create_table.sql")
-            create_query = create_query_path.read_text()
-            cursor.execute(create_query)
-
-            if insert_values:
-                insert_query_path = Path("src/sql/insert_into.sql")
-                insert_query = insert_query_path.read_text()
-                cursor.executemany(insert_query, insert_values)
-
-            conn.commit()
-            logger.info("Database has been updated.")
-
-    except sqlite3.OperationalError as err:
-        logger.error("Database operation failed:", err)
+    insert_values = [tuple(user.values()) for user in users]
+    try:
+        cursor = conn.cursor()
+        cursor.executemany(insert_query, insert_values)
+        conn.commit()
+    except sqlite3.DatabaseError as err:
+        logger.error("Database operation failed: %s", err)
         conn.rollback()
+        raise
+    logger.info("Users have been added to the database.")
 
-    except Exception as exc:
-        logger.error("Saving to database failed:", exc)
-        conn.rollback()
 
 def save_to_file(
         users: Sequence[Mapping[str, Any]]
@@ -70,7 +143,6 @@ def save_to_file(
         logger.error("Users sequence is empty.")
         return
 
-    CSV_FILE_PATH = "data/file/users.csv"
     file_path = Path(CSV_FILE_PATH)
     file_exists = file_path.exists()
     file_mode = 'a' if file_exists else 'w'
