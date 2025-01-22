@@ -29,39 +29,28 @@ def save_to_db(
     users : Sequence[Mapping[str, Any]]
         A sequence of dictionaries representing user data.
     """
-    create_table = """
-        CREATE TABLE IF NOT EXISTS users(
-            id INTEGER PRIMARY KEY, 
-            first_name TEXT NOT NULL, 
-            last_name TEXT NOT NULL, 
-            age INT NOT NULL, 
-            gender TEXT NOT NULL, 
-            country TEXT, 
-            fave_category TEXT
-        );
-    """
-
-    insert_into = """
-        INSERT INTO users(
-            first_name, last_name, age, gender, country, fave_category)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """
-
     insert_values = [tuple(user.values()) for user in users]
 
     try:
         with sqlite3.connect(DATABASE_PATH) as conn:
             cursor = conn.cursor()
-            cursor.execute(create_table)
+
+            create_query_path = Path("src/sql/create_table.sql")
+            create_query = create_query_path.read_text()
+            cursor.execute(create_query)
 
             if insert_values:
-                cursor.executemany(insert_into, insert_values)
+                insert_query_path = Path("src/sql/insert_into.sql")
+                insert_query = insert_query_path.read_text()
+                cursor.executemany(insert_query, insert_values)
 
             conn.commit()
             logger.info("Database has been updated.")
+
     except sqlite3.OperationalError as err:
         logger.error("Database operation failed:", err)
         conn.rollback()
+
     except Exception as exc:
         logger.error("Saving to database failed:", exc)
         conn.rollback()
