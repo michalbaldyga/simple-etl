@@ -1,11 +1,15 @@
 import csv
 import logging.config
-import os
 import sqlite3
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
-from config.config import DATABASE, LOG_FILE_PATH, LOGGING_CONFIG_FILE
+from config.config import (
+    DATABASE_PATH,
+    LOG_FILE_PATH,
+    LOGGING_CONFIG_FILE,
+)
 
 logging.config.fileConfig(
     fname=LOGGING_CONFIG_FILE,
@@ -46,7 +50,7 @@ def save_to_db(
     insert_values = [tuple(user.values()) for user in users]
 
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with sqlite3.connect(DATABASE_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute(create_table)
 
@@ -77,21 +81,21 @@ def save_to_file(
         logger.error("Users sequence is empty.")
         return
 
-    file_name = "data/file/users.csv"
-    file_exists = os.path.isfile(file_name) and os.path.getsize(file_name) > 0
+    CSV_FILE_PATH = "data/file/users.csv"
+    file_path = Path(CSV_FILE_PATH)
+    file_exists = file_path.exists()
     file_mode = 'a' if file_exists else 'w'
 
     try:
-        with (open(file_name, mode=file_mode, newline='', encoding="utf-8")
-              as file):
-            writer = csv.DictWriter(file, fieldnames=users[0].keys())
+        with file_path.open(mode=file_mode, newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=users[0].keys())
+
             if not file_exists:
                 writer.writeheader()
+
             writer.writerows(users)
+
     except Exception as exc:
         logger.error("Saving to file failed:", exc)
 
-    if file_exists:
-        logger.info(f"New users has been appended to {file_name}.")
-    else:
-        logger.info(f"{file_name} has been created with new users.")
+    logger.info(f"File \"{file_path.name}\" has been updated.")
