@@ -1,5 +1,6 @@
 import logging.config
 from collections.abc import Mapping, Sequence
+from typing import Any
 
 from config.config import LOG_FILE_PATH, LOGGING_CONFIG_FILE
 from src.extract import get_product_category, get_user_carts, get_user_country
@@ -125,7 +126,7 @@ def extract_products_from_carts(
 
 
 def extract_products_from_cart(
-        cart: Mapping
+        cart: Mapping[str, Any]
 ) -> list[dict]:
     """
     Extracts products from the cart and returns a list of dictionaries

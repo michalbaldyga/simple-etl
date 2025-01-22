@@ -1,6 +1,7 @@
 import logging.config
 from collections.abc import Sequence
 from functools import partial
+from typing import Any
 
 import backoff
 import httpx
@@ -24,7 +25,7 @@ def get_users(
         limit: int = 30,
         skip: int = 0,
         select: Sequence[str] = None
-) -> list:
+) -> list[dict[str, Any]]:
     """
     Get users data from the USERS_ENDPOINT.
 
