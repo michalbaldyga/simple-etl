@@ -33,15 +33,15 @@ def get_user_data(
         logger.error("User ID is missing.")
         raise ValueError("User ID is missing.")
 
-    first_name = user.get("firstName", "Unknown")
-    last_name = user.get("lastName", "Unknown")
-    age = user.get("age", "Unknown")
-    gender = user.get("gender", "Unknown")
+    first_name = user.get("firstName")
+    last_name = user.get("lastName")
+    age = user.get("age")
+    gender = user.get("gender")
 
     coordinates = user.get("address", {}).get("coordinates", {})
     lat = coordinates.get("lat")
     lng = coordinates.get("lng")
-    country = get_user_country(lat, lng) if lat and lng else "Unknown"
+    country = get_user_country(lat, lng) if lat and lng else None
 
     carts = get_user_carts(user_id).get("carts", [])
     products = extract_products_from_carts(carts)
@@ -60,7 +60,7 @@ def get_user_data(
 
 def get_most_common_category(
        products: Mapping[str, int]
-) -> str:
+) -> str | None:
     """
     Get the category with the highest quantity from a dictionary of products.
 
@@ -74,7 +74,7 @@ def get_most_common_category(
     -------
     str: The category with the highest quantity.
     """
-    return max(products, key=products.get) if products else "Unknown"
+    return max(products, key=products.get) if products else None
 
 
 def group_products_by_category(

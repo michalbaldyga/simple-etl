@@ -156,7 +156,7 @@ def get_query_params(
 def get_user_country(
         latitude: float,
         longitude: float
-) -> str:
+) -> str | None:
     """
     Get the user's country based on coordinates.
 
@@ -171,6 +171,7 @@ def get_user_country(
     -------
         str: User country.
     """
+    location = None
     geolocator = Nominatim(user_agent="simple-etl")
     reverse = partial(geolocator.reverse, language="en")
 
@@ -180,14 +181,12 @@ def get_user_country(
         logger.error(
             "The call to the geocoding service was aborted because "
             "no response has been received.")
-        return "Unknown"
     except Exception as exc:
         logger.error("Locating the user failed:", exc)
-        return "Unknown"
 
     if not location:
         logger.warning(
             f"No location found for 'lat': {latitude}, 'lng': {longitude})")
-        return "Unknown"
+        return
 
-    return location.raw.get("address", {}).get("country", "Unknown")
+    return location.raw.get("address", {}).get("country")
