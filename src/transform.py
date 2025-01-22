@@ -3,7 +3,11 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from config.config import LOG_FILE_PATH, LOGGING_CONFIG_FILE
-from src.extract import get_product_category, get_user_carts, get_user_country
+from src.extract import (
+    get_product_category,
+    get_user_carts,
+    get_user_country,
+)
 
 logging.config.fileConfig(
     fname=LOGGING_CONFIG_FILE,
@@ -16,17 +20,17 @@ def get_user_data(
         user: Mapping[str, Any]
 ) -> dict[str, Any]:
     """
-    Get user data with additional information such as country
-    and favorite product category.
+    Get user data with additional information.
 
     Parameters
     ----------
-    user: Mapping[str, Any]
+    user : Mapping[str, Any]
         Dictionary containing user information.
 
     Returns
     -------
-    dict[str, Any]: User data with added details.
+    dict[str, Any]
+        User data with added details.
     """
     user_id = user.get("id")
     if not user_id:
@@ -62,17 +66,18 @@ def get_most_common_category(
        products: Mapping[str, int]
 ) -> str | None:
     """
-    Get the category with the highest quantity from a dictionary of products.
+    Get the category with the highest quantity.
 
     Parameters
     ----------
     products : Mapping[str, int]
-        A dictionary where the keys are product categories and the values
-        are the total quantities of products in each category.
+        A dictionary where the keys are product categories and the
+        values are the total quantities of products in each category.
 
     Returns
     -------
-    str: The category with the highest quantity.
+    str
+        The category with the highest quantity.
     """
     return max(products, key=products.get) if products else None
 
@@ -81,18 +86,20 @@ def group_products_by_category(
         products: Sequence[Mapping[str, Any]]
 ) -> dict[str, int]:
     """
-    Groups products by their categories and sums the quantities.
+    Group products by their categories and sums the quantities.
 
     Parameters
     ----------
     products : Sequence[Mapping[str, Any]]
-        A sequence of dictionaries, where each dictionary represents
-        a product with keys 'category' and 'quantity'.
+        A sequence of dictionaries, where each dictionary
+        represents a product with keys 'category' and 'quantity'.
 
     Returns
     -------
-    dict[str, int]: A dictionary where the keys are product categories and the
-    values are the total quantities of products in each category.
+    dict[str, int]
+        A dictionary where the keys are product categories
+        and the values are the total quantities
+        of products in each category.
     """
     grouped = {}
     for product in products:
@@ -106,9 +113,9 @@ def extract_products_from_carts(
         carts: Sequence[Mapping[str, Any]]
 ) -> list[dict[str, Any]]:
     """
-    Extracts products from the carts and returns a list of dictionaries
-    in the following format:
+    Extract products from the carts.
 
+    Return products in the following format:
     [{'id': ..., 'quantity': ..., 'category': ...}, ...]
 
     Parameters
@@ -118,8 +125,9 @@ def extract_products_from_carts(
 
     Returns
     -------
-    list[dict[str, Any]]: A list of dictionaries, where each dictionary represents
-    a product.
+    list[dict[str, Any]]
+        A list of dictionaries, where each dictionary
+        represents a product.
     """
     return [product for cart in carts
             for product in extract_products_from_cart(cart)]
@@ -129,9 +137,9 @@ def extract_products_from_cart(
         cart: Mapping[str, Any]
 ) -> list[dict[str, Any]]:
     """
-    Extracts products from the cart and returns a list of dictionaries
-    in the following format:
+    Extract products from the cart.
 
+    Return products in following format:
     [{'id': ..., 'quantity': ..., 'category': ...}, ...]
 
     Parameters
@@ -141,8 +149,9 @@ def extract_products_from_cart(
 
     Returns
     -------
-    list[dict[str, Any]]: A list of dictionaries, where each dictionary represents
-    a product.
+    list[dict[str, Any]]
+        A list of dictionaries, where
+        each dictionary represents a product.
     """
     products = cart.get("products")
     result = []

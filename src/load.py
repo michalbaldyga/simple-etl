@@ -18,7 +18,7 @@ def save_to_db(
         users: Sequence[Mapping[str, Any]]
 ) -> None:
     """
-    Saves a sequence of user dictionaries to a database.
+    Save a sequence of user dictionaries to a database.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ def save_to_file(
         users: Sequence[Mapping[str, Any]]
 ) -> None:
     """
-    Saves a sequence of user dictionaries to a CSV file.
+    Save a sequence of user dictionaries to a CSV file.
 
     Parameters
     ----------

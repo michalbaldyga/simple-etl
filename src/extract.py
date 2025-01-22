@@ -40,7 +40,8 @@ def get_users(
 
     Returns
     -------
-        list[dict[str, Any]]: A list containing users data.
+    list[dict[str, Any]]
+        A list containing users data.
     """
     try:
         query_params = get_query_params(limit, skip, select)
@@ -72,7 +73,8 @@ def get_user_carts(
 
     Returns
     -------
-        dict[str, Any]: A dictionary containing user carts data.
+    dict[str, Any]
+        A dictionary containing user carts data.
     """
     url = f"{USER_CARTS_ENDPOINT}/{user_id}"
     try:
@@ -101,7 +103,8 @@ def get_product_category(
 
     Returns
     -------
-        str: The category of the product.
+    str
+        The category of the product.
     """
     url = f"{PRODUCTS_ENDPOINT}/{product_id}"
     query_params = {"select": "category"}
@@ -137,7 +140,8 @@ def get_query_params(
 
     Returns
     -------
-        dict[str, str]: A dictionary of query parameters.
+    dict[str, str]
+        A dictionary of query parameters.
     """
     if limit < 0 or skip < 0:
         raise ValueError(

@@ -12,20 +12,11 @@ dev = [
 ]
 
 [tool.ruff.lint]
-select = [
-    # pycodestyle
-    "E",
-    # Pyflakes
-    "F",
-    # pyupgrade
-    "UP",
-    # flake8-bugbear
-    "B",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
-]
+select = ["E", "F", "UP", "B", "SIM", "I",]
 
 [tool.ruff]
 line-length = 79
+
+[tool.pydocstyle]
+convention = "numpy"
+add-ignore = ["D100", "D103", "D104", "D205"]
