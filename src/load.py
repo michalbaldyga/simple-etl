@@ -162,5 +162,6 @@ def save_to_file(
 
     except Exception as exc:
         logger.error("Saving to file failed:", exc)
+        raise
 
     logger.info(f"File \"{file_path.name}\" has been updated.")

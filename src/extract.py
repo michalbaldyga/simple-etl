@@ -49,13 +49,16 @@ def get_users(
         resp.raise_for_status()
     except ValueError:
         logger.error("Both 'limit' and 'skip' must be non-negative integers.")
+        raise
     except httpx.RequestError as exc:
         logger.error(
             f"An error occurred while requesting {exc.request.url!r}.")
+        raise
     except httpx.HTTPStatusError as exc:
         logger.error(
             f"Error response {exc.response.status_code} "
             f"while requesting {exc.request.url!r}.")
+        raise
     else:
         return resp.json().get("users", [])
 
