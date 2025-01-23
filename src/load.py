@@ -1,15 +1,16 @@
 import csv
 import logging.config
 import sqlite3
-from sqlite3 import Error, Connection
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from sqlite3 import Connection, Error
 from typing import Any
 
 from config.config import (
+    CSV_FILE_PATH,
     DATABASE_PATH,
     LOG_FILE_PATH,
-    LOGGING_CONFIG_FILE, CSV_FILE_PATH,
+    LOGGING_CONFIG_FILE,
 )
 
 logging.config.fileConfig(
@@ -45,7 +46,7 @@ def open_db_connection(
 
 
 def close_db_connection(
-        conn: Connection
+        conn: Connection | None
 ) -> None:
     """
     Close the database connection.
@@ -55,6 +56,9 @@ def close_db_connection(
     conn : Connection
         A connection to the SQLite database.
     """
+    if not conn:
+        return
+
     try:
         conn.close()
     except Error as err:
