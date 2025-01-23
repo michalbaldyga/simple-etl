@@ -1,0 +1,3 @@
+2025-01-23 11:09:01,352 - INFO - load.py - create_users_table:97 - Users table has been created.
+2025-01-23 11:09:03,271 - WARNING - extract.py - get_user_country:195 - No location found for 'lat': -77.16213, 'lng': -92.084824)
+2025-01-23 11:09:04,390 - INFO - load.py - insert_into_users:135 - Users have been added to the database.
