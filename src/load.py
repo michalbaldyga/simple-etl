@@ -79,10 +79,11 @@ def create_users_table(
         A connection to the SQLite database.
     """
     create_query_path = Path("src/sql/create_table.sql")
+
     try:
         create_query = create_query_path.read_text()
-    except Exception as err:
-        logger.error(f"Failed to read SQL file: {create_query_path} - {err}")
+    except Exception as exc:
+        logger.error(f"Failed to read SQL file: {create_query_path} - {exc}")
         raise
 
     try:
@@ -92,6 +93,7 @@ def create_users_table(
     except sqlite3.DatabaseError as err:
         logger.error("Database operation failed:", err)
         raise
+
     logger.info("Users table has been created.")
 
 
@@ -116,8 +118,8 @@ def insert_into_users(
     insert_query_path = Path("src/sql/insert_into.sql")
     try:
         insert_query = insert_query_path.read_text()
-    except Exception as err:
-        logger.error(f"Failed to read SQL file: {insert_query_path} - {err}")
+    except Exception as exc:
+        logger.error(f"Failed to read SQL file: {insert_query_path} - {exc}")
         raise
 
     insert_values = [tuple(user.values()) for user in users]
@@ -129,6 +131,7 @@ def insert_into_users(
         logger.error("Database operation failed: %s", err)
         conn.rollback()
         raise
+
     logger.info("Users have been added to the database.")
 
 
