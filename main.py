@@ -19,32 +19,33 @@ logger = logging.getLogger("logger_file")
 
 def main():
     user_params = ["firstName", "lastName", "age", "gender", "address"]
-    batch_size = 1
-    offset = 0
+    batch_size, offset = 1, 0
     conn = None
 
-    while True:
-        try:
-            users = get_users(batch_size, offset, user_params)
-            if not users:
+    try:
+        conn = open_db_connection(DATABASE_PATH)
+        create_users_table(conn)
+
+        while True:
+            try:
+                users = get_users(batch_size, offset, user_params)
+                if not users:
+                    logger.info("No more users to process.")
+                    break
+
+                users_clean = [get_user_data(user) for user in users]
+                insert_into_users(conn, users_clean)
+                offset += batch_size
+
+            except Exception as exc:
+                logger.error(f"Unexpected error: {exc}")
                 break
 
-            users_clean = [get_user_data(user) for user in users]
+    except Exception as exc:
+        logger.error(f"Unexpected error: {exc}")
 
-            if not conn:
-                conn = open_db_connection(DATABASE_PATH)
-
-            create_users_table(conn)
-            insert_into_users(conn, users_clean)
-            offset += batch_size
-
-        except Exception as exc:
-            logger.error(f"An unexpected error occurred: {exc}")
-
-        finally:
-            close_db_connection(conn)
-
-        break
+    finally:
+        close_db_connection(conn)
 
 
 if __name__ == "__main__":
